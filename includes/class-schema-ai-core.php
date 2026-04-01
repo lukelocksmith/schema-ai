@@ -62,9 +62,13 @@ class Schema_AI_Core {
 		$cache = new Schema_AI_Cache();
 		$cache->init();
 
-		// TODO: Instantiate Schema_AI_Generator when class exists.
+		$generator = new Schema_AI_Generator();
+		$generator->init();
+
+		$frontend = new Schema_AI_Frontend();
+		$frontend->init();
+
 		// TODO: Instantiate Schema_AI_Admin when class exists.
-		// TODO: Instantiate Schema_AI_Output when class exists.
 		// TODO: Instantiate Schema_AI_Bulk when class exists.
 
 		// Check for DB upgrades.
