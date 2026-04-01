@@ -173,7 +173,7 @@ class Schema_AI_Admin {
 		wp_enqueue_script(
 			'schema-ai-admin',
 			SCHEMA_AI_URL . 'admin/js/admin.js',
-			array( 'jquery' ),
+			array(),
 			SCHEMA_AI_VERSION,
 			true
 		);
