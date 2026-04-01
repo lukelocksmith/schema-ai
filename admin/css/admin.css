@@ -1,0 +1,355 @@
+/**
+ * Schema AI — Admin Styles.
+ *
+ * @package Schema_AI
+ */
+
+/* ------------------------------------------------------------------ */
+/*  Dashboard: Cards                                                   */
+/* ------------------------------------------------------------------ */
+
+.schema-ai-cards {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 16px;
+	margin-top: 16px;
+}
+
+.schema-ai-card {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	padding: 16px 20px;
+	margin-bottom: 16px;
+}
+
+.schema-ai-card h2 {
+	margin-top: 0;
+	padding-top: 0;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Dashboard: Stats Grid                                              */
+/* ------------------------------------------------------------------ */
+
+.schema-ai-stats-grid {
+	display: grid;
+	grid-template-columns: repeat( 4, 1fr );
+	gap: 12px;
+	margin: 12px 0;
+}
+
+.schema-ai-stat {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	padding: 12px 8px;
+}
+
+.schema-ai-stat-value {
+	font-size: 28px;
+	font-weight: 600;
+	line-height: 1.2;
+}
+
+.schema-ai-stat-value small {
+	font-size: 14px;
+	font-weight: 400;
+	color: #646970;
+}
+
+.schema-ai-stat-label {
+	font-size: 12px;
+	color: #646970;
+	margin-top: 4px;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.schema-ai-stat--success {
+	color: #00a32a;
+}
+
+.schema-ai-stat--error {
+	color: #d63638;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Type Badges                                                        */
+/* ------------------------------------------------------------------ */
+
+.schema-ai-badge,
+.schema-ai-type-badge {
+	display: inline-block;
+	background: #f0f0f1;
+	color: #1d2327;
+	font-size: 12px;
+	line-height: 1;
+	padding: 4px 8px;
+	border-radius: 3px;
+	margin: 2px 4px 2px 0;
+}
+
+.schema-ai-badge strong {
+	margin-left: 4px;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Status Icons (dashboard table)                                     */
+/* ------------------------------------------------------------------ */
+
+.schema-ai-status--success {
+	color: #00a32a;
+}
+
+.schema-ai-status--warning {
+	color: #dba617;
+}
+
+.schema-ai-status--error {
+	color: #d63638;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Meta Box                                                           */
+/* ------------------------------------------------------------------ */
+
+.schema-ai-metabox-wrapper {
+	padding: 4px 0;
+}
+
+.schema-ai-metabox-status {
+	display: flex;
+	align-items: center;
+	margin-bottom: 8px;
+}
+
+.schema-ai-status-badge {
+	display: inline-block;
+	font-size: 12px;
+	font-weight: 600;
+	padding: 3px 8px;
+	border-radius: 3px;
+	line-height: 1.4;
+}
+
+.schema-ai-status-badge--auto {
+	background: #e7f5ea;
+	color: #00a32a;
+}
+
+.schema-ai-status-badge--edited {
+	background: #e7f2f9;
+	color: #0073aa;
+}
+
+.schema-ai-status-badge--error {
+	background: #fcecec;
+	color: #d63638;
+}
+
+.schema-ai-status-badge--none {
+	background: #f0f0f1;
+	color: #646970;
+}
+
+.schema-ai-status-badge--manual {
+	background: #f0e6ff;
+	color: #6b21a8;
+}
+
+/* JSON editor textarea */
+.schema-ai-metabox-json textarea {
+	font-family: monospace;
+	font-size: 12px;
+	background: #f6f7f7;
+	width: 100%;
+	resize: vertical;
+}
+
+.schema-ai-editing {
+	background: #fff !important;
+	border-color: #2271b1 !important;
+	box-shadow: 0 0 0 1px #2271b1;
+}
+
+/* Validation */
+.schema-ai-metabox-validation {
+	margin: 8px 0;
+}
+
+.schema-ai-validation--valid {
+	background: #e7f5ea;
+	color: #00a32a;
+	padding: 6px 10px;
+	border-radius: 3px;
+	margin: 0;
+}
+
+.schema-ai-validation--valid .dashicons {
+	vertical-align: middle;
+	margin-right: 4px;
+}
+
+.schema-ai-validation--invalid {
+	background: #fcecec;
+	color: #d63638;
+	padding: 6px 10px;
+	border-radius: 3px;
+	margin: 0;
+}
+
+.schema-ai-validation--invalid .dashicons {
+	vertical-align: middle;
+	margin-right: 4px;
+}
+
+.schema-ai-validation-error {
+	color: #d63638;
+}
+
+.schema-ai-validation-warning {
+	color: #dba617;
+}
+
+/* Action buttons */
+.schema-ai-metabox-actions {
+	display: flex;
+	gap: 6px;
+	margin-top: 10px;
+	flex-wrap: wrap;
+}
+
+.schema-ai-metabox-actions .button {
+	flex-shrink: 0;
+}
+
+.button.schema-ai-remove {
+	color: #d63638;
+	border-color: #d63638;
+}
+
+.button.schema-ai-remove:hover {
+	background: #d63638;
+	color: #fff;
+	border-color: #d63638;
+}
+
+/* Spinner */
+.schema-ai-spinner {
+	text-align: center;
+	padding: 8px 0;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Bulk: Progress Bar                                                 */
+/* ------------------------------------------------------------------ */
+
+.schema-ai-progress-bar {
+	background: #dcdcde;
+	border-radius: 12px;
+	height: 24px;
+	overflow: hidden;
+	position: relative;
+}
+
+.schema-ai-progress-bar-fill {
+	background: #2271b1;
+	height: 100%;
+	border-radius: 12px;
+	transition: width 0.4s ease;
+	min-width: 0;
+}
+
+.schema-ai-bulk-info {
+	margin-top: 8px;
+	font-size: 13px;
+	color: #1d2327;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Bulk: Log                                                          */
+/* ------------------------------------------------------------------ */
+
+.schema-ai-bulk-log {
+	max-height: 400px;
+	overflow-y: auto;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	padding: 8px;
+	background: #f6f7f7;
+}
+
+.schema-ai-log-entry {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 4px 0;
+	font-size: 13px;
+	border-bottom: 1px solid #f0f0f1;
+}
+
+.schema-ai-log-entry:last-child {
+	border-bottom: none;
+}
+
+.schema-ai-log-icon {
+	flex-shrink: 0;
+	width: 18px;
+	text-align: center;
+	font-weight: 600;
+}
+
+.schema-ai-log-ok .schema-ai-log-icon {
+	color: #00a32a;
+}
+
+.schema-ai-log-err .schema-ai-log-icon {
+	color: #d63638;
+}
+
+.schema-ai-log-title {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.schema-ai-log-error {
+	color: #d63638;
+	font-size: 12px;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Settings                                                           */
+/* ------------------------------------------------------------------ */
+
+.schema-ai-key-ok {
+	color: #00a32a;
+	font-weight: 600;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Empty state                                                        */
+/* ------------------------------------------------------------------ */
+
+.schema-ai-empty-state {
+	color: #646970;
+	font-style: italic;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Responsive                                                         */
+/* ------------------------------------------------------------------ */
+
+@media ( max-width: 782px ) {
+	.schema-ai-cards {
+		grid-template-columns: 1fr;
+	}
+
+	.schema-ai-stats-grid {
+		grid-template-columns: repeat( 2, 1fr );
+	}
+}
