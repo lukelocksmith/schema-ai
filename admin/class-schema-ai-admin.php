@@ -17,6 +17,7 @@ class Schema_AI_Admin {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 		add_action( 'admin_notices', array( $this, 'conflict_notice' ) );
+		add_action( 'wp_ajax_schema_ai_test_key', array( $this, 'ajax_test_key' ) );
 	}
 
 	/**
@@ -321,5 +322,55 @@ class Schema_AI_Admin {
 			'errors'      => $errors,
 			'types'       => $types,
 		);
+	}
+
+	/**
+	 * AJAX: Test API key by sending a simple request to Gemini.
+	 */
+	public function ajax_test_key(): void {
+		check_ajax_referer( 'schema_ai_nonce', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => 'Unauthorized' ) );
+		}
+
+		$api_key = Schema_AI_Core::get_api_key();
+		if ( empty( $api_key ) ) {
+			wp_send_json_error( array( 'message' => __( 'No API key configured. Save settings first.', 'schema-ai' ) ) );
+		}
+
+		$model = get_option( 'schema_ai_model', 'gemini-2.5-flash' );
+		$url   = Schema_AI_Gemini::API_BASE . $model . ':generateContent';
+
+		$response = wp_remote_post(
+			$url,
+			array(
+				'timeout' => 15,
+				'headers' => array(
+					'Content-Type'   => 'application/json',
+					'x-goog-api-key' => $api_key,
+				),
+				'body'    => wp_json_encode(
+					array(
+						'contents'         => array( array( 'parts' => array( array( 'text' => 'Return: {"test": true}' ) ) ) ),
+						'generationConfig' => array( 'maxOutputTokens' => 20, 'responseMimeType' => 'application/json' ),
+					)
+				),
+			)
+		);
+
+		if ( is_wp_error( $response ) ) {
+			wp_send_json_error( array( 'message' => $response->get_error_message() ) );
+		}
+
+		$code = wp_remote_retrieve_response_code( $response );
+
+		if ( 200 === $code ) {
+			wp_send_json_success( array( 'message' => sprintf( __( 'API key works! Model: %s', 'schema-ai' ), $model ) ) );
+		} else {
+			$body = json_decode( wp_remote_retrieve_body( $response ), true );
+			$msg  = $body['error']['message'] ?? "HTTP {$code}";
+			wp_send_json_error( array( 'message' => $msg ) );
+		}
 	}
 }

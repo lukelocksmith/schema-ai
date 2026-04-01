@@ -103,7 +103,7 @@ class Schema_AI_Core {
 
 		// Set default options.
 		$defaults = array(
-			'schema_ai_model'              => 'gemini-2.0-flash',
+			'schema_ai_model'              => 'gemini-2.5-flash',
 			'schema_ai_auto_generate'      => 1,
 			'schema_ai_post_types'         => array( 'post', 'page' ),
 			'schema_ai_publisher_name'     => get_bloginfo( 'name' ),

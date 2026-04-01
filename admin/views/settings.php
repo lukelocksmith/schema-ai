@@ -42,6 +42,8 @@ $available_categories = get_categories( array( 'hide_empty' => false ) );
 						class="regular-text"
 						autocomplete="off"
 					/>
+					<button type="button" class="button" id="schema-ai-test-key"><?php esc_html_e( 'Test API Key', 'schema-ai' ); ?></button>
+					<span id="schema-ai-test-result"></span>
 					<p class="description">
 						<?php esc_html_e( 'Your Google Gemini API key.', 'schema-ai' ); ?>
 					</p>

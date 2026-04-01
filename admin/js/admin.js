@@ -346,9 +346,33 @@
 	/*  Bootstrap                                                          */
 	/* ------------------------------------------------------------------ */
 
+	function initSettings() {
+		var btn = document.getElementById( 'schema-ai-test-key' );
+		if ( ! btn ) return;
+
+		btn.addEventListener( 'click', function () {
+			var result = document.getElementById( 'schema-ai-test-result' );
+			btn.disabled = true;
+			result.textContent = 'Testing...';
+			result.className = '';
+
+			ajax( 'schema_ai_test_key' ).then( function ( res ) {
+				btn.disabled = false;
+				if ( res.success ) {
+					result.textContent = res.data.message;
+					result.className = 'schema-ai-key-ok';
+				} else {
+					result.textContent = res.data.message || 'Error';
+					result.className = 'schema-ai-status-err';
+				}
+			} );
+		} );
+	}
+
 	function init() {
 		initMetaBox();
 		initBulk();
+		initSettings();
 	}
 
 	if ( document.readyState === 'loading' ) {
