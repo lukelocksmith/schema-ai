@@ -76,7 +76,16 @@ class Schema_AI_Core {
 			$metabox->init();
 		}
 
-		// TODO: Instantiate Schema_AI_Bulk when class exists.
+		$bulk = new Schema_AI_Bulk();
+		$bulk->init();
+
+		$rest = new Schema_AI_Rest();
+		$rest->init();
+
+		// Register WP-CLI commands.
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			Schema_AI_CLI::register();
+		}
 
 		// Check for DB upgrades.
 		$this->maybe_upgrade();
@@ -134,6 +143,7 @@ class Schema_AI_Core {
 		if ( function_exists( 'as_unschedule_all_actions' ) ) {
 			as_unschedule_all_actions( 'schema_ai_generate' );
 			as_unschedule_all_actions( 'schema_ai_bulk_generate' );
+			as_unschedule_all_actions( 'schema_ai_bulk_process' );
 		}
 
 		// Clear all plugin transients.
