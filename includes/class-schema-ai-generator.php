@@ -179,6 +179,7 @@ class Schema_AI_Generator {
 
 		$publisher_name = get_option( 'schema_ai_publisher_name', get_bloginfo( 'name' ) );
 		$publisher_url  = get_option( 'schema_ai_publisher_url', home_url() );
+		$publisher_logo = get_option( 'schema_ai_publisher_logo', '' );
 		$locale         = get_locale();
 
 		$prompt = <<<PROMPT
@@ -207,9 +208,10 @@ INSTRUCTIONS:
 4. For FAQPage: extract actual Q&A pairs from content
 5. For Article/BlogPosting: include full author, publisher, image objects
 6. Use @graph if multiple types apply (e.g. Article + FAQPage)
-7. Publisher is always: {"@type": "Organization", "name": "{$publisher_name}", "url": "{$publisher_url}"}
+7. Publisher is always: {"@type": "Organization", "name": "{$publisher_name}", "url": "{$publisher_url}", "logo": {"@type": "ImageObject", "url": "{$publisher_logo}"}}
 8. Generate all property values in the SAME LANGUAGE as the content
 9. Always include @context: "https://schema.org"
+10. For Article/TechArticle/BlogPosting: include wordCount (count words in the content)
 
 Return ONLY valid JSON-LD. No explanations, no markdown, no code fences.
 PROMPT;
