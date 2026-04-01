@@ -112,6 +112,16 @@ class Schema_AI_Generator {
 
 		$schema = $result['data'];
 
+		// Fix: if Gemini returned a plain array instead of @graph object, wrap it.
+		if ( isset( $schema[0] ) && ! isset( $schema['@type'] ) && ! isset( $schema['@graph'] ) ) {
+			$context = $schema['@context'] ?? 'https://schema.org';
+			unset( $schema['@context'] );
+			$schema = array(
+				'@context' => $context,
+				'@graph'   => array_values( array_filter( $schema, 'is_array' ) ),
+			);
+		}
+
 		// Ensure @context is present.
 		if ( empty( $schema['@context'] ) ) {
 			$schema['@context'] = 'https://schema.org';
