@@ -68,7 +68,14 @@ class Schema_AI_Core {
 		$frontend = new Schema_AI_Frontend();
 		$frontend->init();
 
-		// TODO: Instantiate Schema_AI_Admin when class exists.
+		if ( is_admin() ) {
+			$admin = new Schema_AI_Admin();
+			$admin->init();
+
+			$metabox = new Schema_AI_Metabox();
+			$metabox->init();
+		}
+
 		// TODO: Instantiate Schema_AI_Bulk when class exists.
 
 		// Check for DB upgrades.
