@@ -18,6 +18,24 @@ class Schema_AI_Admin {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
 		add_action( 'admin_notices', array( $this, 'conflict_notice' ) );
 		add_action( 'wp_ajax_schema_ai_test_key', array( $this, 'ajax_test_key' ) );
+
+		// Schema status column in post lists.
+		add_filter( 'manage_posts_columns', array( $this, 'add_schema_column' ) );
+		add_action( 'manage_posts_custom_column', array( $this, 'render_schema_column' ), 10, 2 );
+		add_filter( 'manage_pages_columns', array( $this, 'add_schema_column' ) );
+		add_action( 'manage_pages_custom_column', array( $this, 'render_schema_column' ), 10, 2 );
+
+		// Bulk actions.
+		add_filter( 'bulk_actions-edit-post', array( $this, 'register_bulk_actions' ) );
+		add_filter( 'handle_bulk_actions-edit-post', array( $this, 'handle_bulk_actions' ), 10, 3 );
+		add_filter( 'bulk_actions-edit-page', array( $this, 'register_bulk_actions' ) );
+		add_filter( 'handle_bulk_actions-edit-page', array( $this, 'handle_bulk_actions' ), 10, 3 );
+		add_action( 'admin_notices', array( $this, 'bulk_action_notice' ) );
+
+		// Row actions.
+		add_filter( 'post_row_actions', array( $this, 'add_row_action' ), 10, 2 );
+		add_filter( 'page_row_actions', array( $this, 'add_row_action' ), 10, 2 );
+		add_action( 'admin_action_schema_ai_generate_single', array( $this, 'handle_single_generate' ) );
 	}
 
 	/**
@@ -159,8 +177,9 @@ class Schema_AI_Admin {
 	public function enqueue_assets( string $hook ): void {
 		$is_plugin_page = str_contains( $hook, 'schema-ai' );
 		$is_edit_post   = in_array( $hook, array( 'post.php', 'post-new.php' ), true );
+		$is_post_list   = 'edit.php' === $hook;
 
-		if ( ! $is_plugin_page && ! $is_edit_post ) {
+		if ( ! $is_plugin_page && ! $is_edit_post && ! $is_post_list ) {
 			return;
 		}
 
@@ -372,5 +391,216 @@ class Schema_AI_Admin {
 			$msg  = $body['error']['message'] ?? "HTTP {$code}";
 			wp_send_json_error( array( 'message' => $msg ) );
 		}
+	}
+
+	/* ------------------------------------------------------------------ */
+	/*  Feature: Schema status column in Posts/Pages list                  */
+	/* ------------------------------------------------------------------ */
+
+	/**
+	 * Add a "Schema" column after the title column.
+	 *
+	 * @param array $columns Existing columns.
+	 * @return array Modified columns.
+	 */
+	public function add_schema_column( array $columns ): array {
+		$new = array();
+
+		foreach ( $columns as $key => $label ) {
+			$new[ $key ] = $label;
+
+			if ( 'title' === $key ) {
+				$new['schema_ai'] = __( 'Schema', 'schema-ai' );
+			}
+		}
+
+		return $new;
+	}
+
+	/**
+	 * Render the schema status column content.
+	 *
+	 * @param string $column  Column name.
+	 * @param int    $post_id Post ID.
+	 */
+	public function render_schema_column( string $column, int $post_id ): void {
+		if ( 'schema_ai' !== $column ) {
+			return;
+		}
+
+		$status = get_post_meta( $post_id, '_schema_ai_status', true );
+		$type   = get_post_meta( $post_id, '_schema_ai_type', true );
+
+		if ( in_array( $status, array( 'auto', 'manual', 'edited' ), true ) ) {
+			$type_label = ! empty( $type ) ? esc_html( $type ) : __( 'Schema', 'schema-ai' );
+			printf(
+				'<span class="schema-ai-col-ok">&#10003; %s</span>',
+				$type_label
+			);
+		} elseif ( 'error' === $status ) {
+			echo '<span class="schema-ai-col-err">&#10007; ' . esc_html__( 'Error', 'schema-ai' ) . '</span>';
+		} else {
+			echo '<span class="schema-ai-col-none">&mdash;</span>';
+		}
+	}
+
+	/* ------------------------------------------------------------------ */
+	/*  Feature: Bulk actions                                              */
+	/* ------------------------------------------------------------------ */
+
+	/**
+	 * Register bulk action to generate schema.
+	 *
+	 * @param array $actions Existing bulk actions.
+	 * @return array Modified bulk actions.
+	 */
+	public function register_bulk_actions( array $actions ): array {
+		$actions['schema_ai_generate'] = __( 'Generate Schema AI', 'schema-ai' );
+		return $actions;
+	}
+
+	/**
+	 * Handle the bulk generate action.
+	 *
+	 * @param string $redirect_to Redirect URL.
+	 * @param string $action      Action name.
+	 * @param array  $post_ids    Selected post IDs.
+	 * @return string Modified redirect URL.
+	 */
+	public function handle_bulk_actions( string $redirect_to, string $action, array $post_ids ): string {
+		if ( 'schema_ai_generate' !== $action ) {
+			return $redirect_to;
+		}
+
+		$generated = 0;
+		$errors    = 0;
+		$generator = new Schema_AI_Generator();
+
+		foreach ( $post_ids as $post_id ) {
+			$post_id = absint( $post_id );
+
+			if ( ! current_user_can( 'edit_post', $post_id ) ) {
+				$errors++;
+				continue;
+			}
+
+			$result = $generator->generate_for_post( $post_id );
+
+			if ( ! empty( $result['success'] ) ) {
+				$generated++;
+			} else {
+				$errors++;
+			}
+		}
+
+		return add_query_arg(
+			array(
+				'schema_ai_generated' => $generated,
+				'schema_ai_errors'    => $errors,
+			),
+			$redirect_to
+		);
+	}
+
+	/**
+	 * Show admin notice after bulk generate action.
+	 */
+	public function bulk_action_notice(): void {
+		if ( ! isset( $_REQUEST['schema_ai_generated'] ) ) {
+			return;
+		}
+
+		$generated = absint( $_REQUEST['schema_ai_generated'] );
+		$errors    = isset( $_REQUEST['schema_ai_errors'] ) ? absint( $_REQUEST['schema_ai_errors'] ) : 0;
+
+		$message = sprintf(
+			/* translators: 1: number of posts generated, 2: number of errors */
+			__( 'Schema generated for %1$d posts (%2$d errors).', 'schema-ai' ),
+			$generated,
+			$errors
+		);
+
+		$type = $errors > 0 ? 'warning' : 'success';
+
+		printf(
+			'<div class="notice notice-%s is-dismissible"><p>%s</p></div>',
+			esc_attr( $type ),
+			esc_html( $message )
+		);
+	}
+
+	/* ------------------------------------------------------------------ */
+	/*  Feature: Row action "Generate Schema"                              */
+	/* ------------------------------------------------------------------ */
+
+	/**
+	 * Add "Generate Schema" row action for published posts.
+	 *
+	 * @param array   $actions Existing row actions.
+	 * @param WP_Post $post    Post object.
+	 * @return array Modified row actions.
+	 */
+	public function add_row_action( array $actions, WP_Post $post ): array {
+		$enabled_types = get_option( 'schema_ai_post_types', array( 'post', 'page' ) );
+
+		if ( ! in_array( $post->post_type, $enabled_types, true ) ) {
+			return $actions;
+		}
+
+		if ( 'publish' !== $post->post_status ) {
+			return $actions;
+		}
+
+		if ( ! current_user_can( 'edit_post', $post->ID ) ) {
+			return $actions;
+		}
+
+		$url = wp_nonce_url(
+			admin_url( 'admin.php?action=schema_ai_generate_single&post_id=' . $post->ID ),
+			'schema_ai_generate_single_' . $post->ID
+		);
+
+		$actions['schema_ai_generate'] = sprintf(
+			'<a href="%s">%s</a>',
+			esc_url( $url ),
+			esc_html__( 'Generate Schema', 'schema-ai' )
+		);
+
+		return $actions;
+	}
+
+	/**
+	 * Handle single post schema generation from row action.
+	 */
+	public function handle_single_generate(): void {
+		$post_id = isset( $_GET['post_id'] ) ? absint( $_GET['post_id'] ) : 0;
+
+		if ( ! $post_id ) {
+			wp_die( esc_html__( 'Invalid post ID.', 'schema-ai' ) );
+		}
+
+		check_admin_referer( 'schema_ai_generate_single_' . $post_id );
+
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			wp_die( esc_html__( 'You do not have permission to edit this post.', 'schema-ai' ) );
+		}
+
+		$generator = new Schema_AI_Generator();
+		$result    = $generator->generate_for_post( $post_id );
+
+		$post      = get_post( $post_id );
+		$post_type = $post ? $post->post_type : 'post';
+
+		$redirect = add_query_arg(
+			array(
+				'post_type'           => $post_type,
+				'schema_ai_generated' => $result['success'] ? 1 : 0,
+				'schema_ai_errors'    => $result['success'] ? 0 : 1,
+			),
+			admin_url( 'edit.php' )
+		);
+
+		wp_safe_redirect( $redirect );
+		exit;
 	}
 }

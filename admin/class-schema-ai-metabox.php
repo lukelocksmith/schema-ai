@@ -145,6 +145,14 @@ class Schema_AI_Metabox {
 				<?php endif; ?>
 			</div>
 
+			<?php if ( ! empty( $schema ) && 'publish' === $post->post_status ) : ?>
+				<div class="schema-ai-mb-test-link" style="margin-top: 8px;">
+					<a href="https://search.google.com/test/rich-results?url=<?php echo urlencode( get_permalink( $post->ID ) ); ?>" target="_blank" rel="noopener" class="button button-link">
+						<?php esc_html_e( 'Test in Google Rich Results', 'schema-ai' ); ?> &#8599;
+					</a>
+				</div>
+			<?php endif; ?>
+
 			<!-- Spinner -->
 			<div class="schema-ai-spinner" style="display: none;">
 				<span class="spinner is-active"></span>
