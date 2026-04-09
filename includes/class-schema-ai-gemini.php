@@ -132,7 +132,7 @@ class Schema_AI_Gemini {
 			$response = wp_remote_post(
 				$url,
 				array(
-					'timeout' => 120,
+					'timeout' => 90,
 					'headers' => array(
 						'Content-Type'   => 'application/json',
 						'x-goog-api-key' => $api_key,
