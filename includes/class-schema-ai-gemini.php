@@ -173,6 +173,15 @@ class Schema_AI_Gemini {
 
 		$response_body = json_decode( wp_remote_retrieve_body( $response ), true );
 
+		$finish_reason = $response_body['candidates'][0]['finishReason'] ?? '';
+
+		if ( 'MAX_TOKENS' === $finish_reason ) {
+			return array(
+				'success' => false,
+				'error'   => __( 'Gemini response truncated (MAX_TOKENS) — schema too large for this content.', 'schema-ai' ),
+			);
+		}
+
 		$text = $response_body['candidates'][0]['content']['parts'][0]['text'] ?? null;
 
 		if ( null === $text ) {

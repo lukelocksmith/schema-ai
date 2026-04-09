@@ -3,7 +3,7 @@
  * Plugin Name: Schema AI
  * Plugin URI: https://github.com/lukaszek/schema-ai
  * Description: AI-powered Schema.org structured data generator for WordPress.
- * Version: 1.1.1
+ * Version: 1.1.2
  * Requires at least: 6.0
  * Requires PHP: 8.0
  * Author: Lukasz Slusarski
@@ -17,7 +17,7 @@
 defined( 'ABSPATH' ) || exit;
 
 // Plugin constants.
-define( 'SCHEMA_AI_VERSION', '1.1.1' );
+define( 'SCHEMA_AI_VERSION', '1.1.2' );
 define( 'SCHEMA_AI_DB_VERSION', '1.0' );
 define( 'SCHEMA_AI_FILE', __FILE__ );
 define( 'SCHEMA_AI_DIR', plugin_dir_path( __FILE__ ) );

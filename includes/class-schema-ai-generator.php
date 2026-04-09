@@ -214,14 +214,15 @@ PHP PRE-ANALYSIS SUGGESTS: {$analysis['type']} (confidence: {$analysis['confiden
 INSTRUCTIONS:
 1. Determine the BEST schema.org type for this content. Choose from: Article, BlogPosting, HowTo, FAQPage, NewsArticle, Review, TechArticle, Product, Service, Event, Organization, LocalBusiness, Recipe, VideoObject, Course, SoftwareApplication
 2. Generate complete JSON-LD with ALL required and recommended properties
-3. For HowTo: extract actual steps from content
-4. For FAQPage: extract actual Q&A pairs from content
+3. For HowTo: extract actual steps — MAX 12 steps, keep step names short (under 60 chars), omit step descriptions
+4. For FAQPage: extract actual Q&A pairs — MAX 10 questions, keep answers under 150 chars each
 5. For Article/BlogPosting: include full author, publisher, image objects
 6. Use @graph if multiple types apply (e.g. Article + FAQPage)
 7. Publisher is always: {"@type": "Organization", "name": "{$publisher_name}", "url": "{$publisher_url}", "logo": {"@type": "ImageObject", "url": "{$publisher_logo}"}}
 8. Generate all property values in the SAME LANGUAGE as the content
 9. Always include @context: "https://schema.org"
 10. For Article/TechArticle/BlogPosting: include wordCount (count words in the content)
+11. IMPORTANT: Keep total JSON output compact — no verbose descriptions, no duplicate data, use short property values
 
 Return ONLY valid JSON-LD. No explanations, no markdown, no code fences.
 PROMPT;
