@@ -45,9 +45,10 @@ class Schema_AI_Metabox {
 	public function render( WP_Post $post ): void {
 		wp_nonce_field( 'schema_ai_metabox', 'schema_ai_metabox_nonce' );
 
-		$status = get_post_meta( $post->ID, '_schema_ai_status', true );
-		$type   = get_post_meta( $post->ID, '_schema_ai_type', true );
-		$raw    = get_post_meta( $post->ID, '_schema_ai_data', true );
+		$status      = get_post_meta( $post->ID, '_schema_ai_status', true );
+		$type        = get_post_meta( $post->ID, '_schema_ai_type', true );
+		$raw         = get_post_meta( $post->ID, '_schema_ai_data', true );
+		$last_error  = 'error' === $status ? Schema_AI_Logger::get_last_error_for_post( $post->ID ) : null;
 
 		$schema     = array();
 		$validation = null;
@@ -77,6 +78,9 @@ class Schema_AI_Metabox {
 						break;
 					case 'error':
 						echo '<span class="schema-ai-status-badge schema-ai-status-badge--error">' . esc_html__( 'Error', 'schema-ai' ) . '</span>';
+						if ( ! empty( $last_error ) ) {
+							echo '<p class="schema-ai-error-detail">' . esc_html( $last_error ) . '</p>';
+						}
 						break;
 					default:
 						echo '<span class="schema-ai-status-badge schema-ai-status-badge--none">' . esc_html__( 'No Schema', 'schema-ai' ) . '</span>';

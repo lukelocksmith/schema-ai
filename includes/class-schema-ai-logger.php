@@ -106,6 +106,28 @@ class Schema_AI_Logger {
 	}
 
 	/**
+	 * Get the most recent error message for a given post.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return string|null Error message or null if none found.
+	 */
+	public static function get_last_error_for_post( int $post_id ): ?string {
+		global $wpdb;
+
+		$table = $wpdb->prefix . 'schema_ai_log';
+
+		return $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT error_message FROM {$table}
+				WHERE post_id = %d AND status = 'error'
+				ORDER BY created_at DESC
+				LIMIT 1",
+				$post_id
+			)
+		);
+	}
+
+	/**
 	 * Get aggregated usage statistics.
 	 *
 	 * @return array {

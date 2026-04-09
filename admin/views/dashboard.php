@@ -90,6 +90,7 @@ defined( 'ABSPATH' ) || exit;
 						<th><?php esc_html_e( 'Post', 'schema-ai' ); ?></th>
 						<th><?php esc_html_e( 'Type', 'schema-ai' ); ?></th>
 						<th><?php esc_html_e( 'Status', 'schema-ai' ); ?></th>
+						<th><?php esc_html_e( 'Details', 'schema-ai' ); ?></th>
 						<th><?php esc_html_e( 'Tokens', 'schema-ai' ); ?></th>
 						<th><?php esc_html_e( 'Duration', 'schema-ai' ); ?></th>
 					</tr>
@@ -136,6 +137,19 @@ defined( 'ABSPATH' ) || exit;
 										break;
 								}
 								?>
+							</td>
+							<td>
+								<?php if ( 'error' === $entry['status'] && ! empty( $entry['error_message'] ) ) : ?>
+									<span class="schema-ai-error-detail" title="<?php echo esc_attr( $entry['error_message'] ); ?>">
+										<?php echo esc_html( mb_strimwidth( $entry['error_message'], 0, 80, '…' ) ); ?>
+									</span>
+								<?php elseif ( 'warning' === $entry['status'] && ! empty( $entry['error_message'] ) ) : ?>
+									<span class="schema-ai-warning-detail" title="<?php echo esc_attr( $entry['error_message'] ); ?>">
+										<?php echo esc_html( mb_strimwidth( $entry['error_message'], 0, 80, '…' ) ); ?>
+									</span>
+								<?php else : ?>
+									&mdash;
+								<?php endif; ?>
 							</td>
 							<td><?php echo esc_html( number_format( (int) $entry['tokens_used'] ) ); ?></td>
 							<td><?php echo esc_html( number_format( (int) $entry['duration_ms'] ) ); ?>ms</td>
